@@ -43,7 +43,8 @@ void InputSomething::Init() {
 }
 
 void InputSomething::Run() {
-    if(m_Init = false) {
+    if(m_Init == false) {
+        std::cout << "1" << std::endl;
         Init();
 
         if(m_Init = false) {
@@ -54,7 +55,7 @@ void InputSomething::Run() {
 
     std::cout << "HEllo" << std::endl;
 
-    SDL_Delay(400000);
+    SDL_Delay(400);
 }
 
 void InputSomething::Quit() {
