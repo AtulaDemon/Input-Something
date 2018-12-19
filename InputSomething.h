@@ -14,12 +14,17 @@ class InputSomething {
 private:
     SDL_Window*     m_Window;
     SDL_Renderer*   m_Renderer;
-    SDL_Texture*    m_Texture;
+    SDL_Texture*    m_Background;
+    SDL_Texture*    m_Question;
     SDL_Event       m_Event;
+    SDL_Rect        m_SrcRect;
+    SDL_Rect        m_DesRect;
     bool            m_Init;
 
     void            Init();
+    void            CreateTexture();
     void            DrawStartScreen();
+    void            DrawQuestion();
 
 public:
                     InputSomething();

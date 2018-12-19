@@ -8,7 +8,8 @@
 InputSomething::InputSomething()
     :   m_Window(nullptr),
         m_Renderer(nullptr),
-        m_Texture(nullptr),
+        m_Background(nullptr),
+        m_Question(nullptr),
         m_Init(false)
 {
 
@@ -46,31 +47,66 @@ void InputSomething::Init() {
 
     SDL_SetRenderDrawColor(m_Renderer, 0, 0, 0, 0);
 
-    SDL_Surface* surface = nullptr;
-
-    surface = IMG_Load("img\\space.jpg");
-
-    if(surface == 0) {
-        SDL_Log("Could not load surface: %s\n", IMG_GetError());
-        return;
-    }
-
-    m_Texture = SDL_CreateTextureFromSurface(m_Renderer, surface);
-
-    if(m_Texture == 0) {
-        SDL_Log("Could not create texture: %s\n", SDL_GetError());
-        return;
-    }
-
-    SDL_FreeSurface(surface);
-
     m_Init = true;
 
     SDL_Log("Initialized.");
 }
 
-void InputSomething::DrawStartScreen() {
+void InputSomething::CreateTexture() {
+    SDL_Surface* surface = nullptr;
+
+    surface = IMG_Load("img\\space.jpg");
+
+    if(surface == nullptr) {
+        SDL_Log("Could not load surface: %s\n", IMG_GetError());
+        return;
+    }
+
+    m_Background = SDL_CreateTextureFromSurface(m_Renderer, surface);
+
+    if(m_Background == 0) {
+        SDL_Log("Could not create texture: %s\n", SDL_GetError());
+        return;
+    }
+
+    SDL_FreeSurface(surface);
+    surface = nullptr;
+
+    SDL_Log("Background texture created");
+
+    TTF_Font* font = nullptr;
+    font = TTF_OpenFont("VeraMoBd.ttf", 30);
+
+    if(font == nullptr) {
+        SDL_Log("Could not load OpenFont: %s\n", TTF_GetError());
+        return;
+    }
+
+    std::string question = "What is your name?";
+
+    SDL_Color font_color = {250, 250, 250};
+
+    surface = TTF_RenderText_Solid(font, question.c_str(), font_color);
+
+    m_Question = SDL_CreateTextureFromSurface(m_Renderer, surface);
+
+    SDL_FreeSurface(surface);
+
+    TTF_SizeText(font, question.c_str(), &m_SrcRect.w, &m_SrcRect.h);
+
+    m_SrcRect.x = 0;
+    m_SrcRect.y = 0;
+    m_DesRect.x = 200;
+    m_DesRect.y = 200;
+    m_DesRect.w = m_SrcRect.w;
+    m_DesRect.h = m_SrcRect.h;
+
+    SDL_Log("Font texture created");
+}
+
+void InputSomething::DrawQuestion() {
     bool isRunning = true;
+
     while(isRunning == true) {
         while(SDL_PollEvent(&m_Event) != 0) {
             if(m_Event.type == SDL_QUIT) {
@@ -84,10 +120,13 @@ void InputSomething::DrawStartScreen() {
             }
         }
 
-        SDL_RenderCopy(m_Renderer, m_Texture, nullptr, nullptr);
+        SDL_RenderCopy(m_Renderer, m_Background, nullptr, nullptr);
+        SDL_RenderCopy(m_Renderer, m_Question, &m_SrcRect, &m_DesRect);
         SDL_RenderPresent(m_Renderer);
         SDL_RenderClear(m_Renderer);
     }
+
+    SDL_Log("Question Drew.");
 }
 
 void InputSomething::Run() {
@@ -99,17 +138,21 @@ void InputSomething::Run() {
             return;
         }
     }
+    CreateTexture();
 
-    DrawStartScreen();
+    DrawQuestion();
 
-    SDL_Delay(10000);
+    SDL_Delay(1000);
 
     SDL_Log("Finished run.");
 }
 
 void InputSomething::Quit() {
-    if(m_Texture != nullptr)
-        SDL_DestroyTexture(m_Texture);
+    if(m_Background != nullptr)
+        SDL_DestroyTexture(m_Background);
+
+    if(m_Question != nullptr)
+        SDL_DestroyTexture(m_Question);
 
     if(m_Renderer != nullptr)
         SDL_RenderClear(m_Renderer);
