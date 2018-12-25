@@ -5,6 +5,7 @@
 #define SCREEN_HEIGHT 600
 
 #include <SDL2/SDL_events.h>
+#include <string>
 
 class SDL_Texture;
 class SDL_Window;
@@ -16,15 +17,20 @@ private:
     SDL_Renderer*   m_Renderer;
     SDL_Texture*    m_Background;
     SDL_Texture*    m_Question;
+    SDL_Texture*    m_Name;
+    SDL_Texture*    m_Hello;
     SDL_Event       m_Event;
-    SDL_Rect        m_SrcRect;
-    SDL_Rect        m_DesRect;
+    SDL_Rect        m_QsRect;
+    SDL_Rect        m_NameRect;
+    SDL_Rect        m_HelloRect;
     bool            m_Init;
+    std::string     m_NameS;
 
     void            Init();
     void            CreateTexture();
-    void            DrawStartScreen();
-    void            DrawQuestion();
+    void            UpdateNameTexture();
+    void            UpdateHelloTexture();
+    void            DrawTexture();
 
 public:
                     InputSomething();

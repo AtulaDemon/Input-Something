@@ -10,7 +10,8 @@ InputSomething::InputSomething()
         m_Renderer(nullptr),
         m_Background(nullptr),
         m_Question(nullptr),
-        m_Init(false)
+        m_Init(false),
+        m_NameS("")
 {
 
 }
@@ -92,41 +93,84 @@ void InputSomething::CreateTexture() {
 
     SDL_FreeSurface(surface);
 
-    TTF_SizeText(font, question.c_str(), &m_SrcRect.w, &m_SrcRect.h);
+    TTF_SizeText(font, question.c_str(), &m_QsRect.w, &m_QsRect.h);
+    m_QsRect.x = 200;
+    m_QsRect.y = 200;
 
-    m_SrcRect.x = 0;
-    m_SrcRect.y = 0;
-    m_DesRect.x = 200;
-    m_DesRect.y = 200;
-    m_DesRect.w = m_SrcRect.w;
-    m_DesRect.h = m_SrcRect.h;
+    SDL_Log("Question texture created");
 
-    SDL_Log("Font texture created");
+    surface = TTF_RenderText_Solid(font, m_NameS.c_str(), font_color);
+
+    m_Name = SDL_CreateTextureFromSurface(m_Renderer, surface);
+
+    m_Hello = SDL_CreateTextureFromSurface(m_Renderer, surface);
+
+    SDL_FreeSurface(surface);
+
+    TTF_SizeText(font, m_NameS.c_str(), &m_NameRect.w, &m_NameRect.h);
+    m_NameRect.x = 200;
+    m_NameRect.y = 300;
+
+    TTF_SizeText(font, m_NameS.c_str(), &m_HelloRect.w, &m_HelloRect.h);
+    m_HelloRect.x = 200;
+    m_HelloRect.y = 400;
+
+    SDL_Log("Name and Hello texture created");
 }
 
-void InputSomething::DrawQuestion() {
-    bool isRunning = true;
-
-    while(isRunning == true) {
-        while(SDL_PollEvent(&m_Event) != 0) {
-            if(m_Event.type == SDL_QUIT) {
-                isRunning = false;
-                break;
-            } else if(m_Event.type == SDL_KEYDOWN) {
-                isRunning = false;
-                break;
-            } else {
-                break;
-            }
-        }
-
-        SDL_RenderCopy(m_Renderer, m_Background, nullptr, nullptr);
-        SDL_RenderCopy(m_Renderer, m_Question, &m_SrcRect, &m_DesRect);
-        SDL_RenderPresent(m_Renderer);
-        SDL_RenderClear(m_Renderer);
+void InputSomething::UpdateNameTexture() {
+    TTF_Font* font = nullptr;
+    font = TTF_OpenFont("VeraMoBd.ttf", 30);
+    if(font == nullptr) {
+        SDL_Log("Could not load OpenFont: %s\n", TTF_GetError());
+        return;
     }
 
-    SDL_Log("Question Drew.");
+    SDL_Color font_color = {250, 250, 250};
+
+    SDL_Surface* surface = nullptr;
+    surface = TTF_RenderText_Solid(font, m_NameS.c_str(), font_color);
+
+    m_Name = SDL_CreateTextureFromSurface(m_Renderer, surface);
+
+    SDL_FreeSurface(surface);
+
+    TTF_SizeText(font, m_NameS.c_str(), &m_NameRect.w, &m_NameRect.h);
+    m_NameRect.x = 200;
+    m_NameRect.y = 300;
+}
+
+void InputSomething::UpdateHelloTexture() {
+    TTF_Font* font = nullptr;
+    font = TTF_OpenFont("VeraMoBd.ttf", 30);
+    if(font == nullptr) {
+        SDL_Log("Could not load OpenFont: %s\n", TTF_GetError());
+        return;
+    }
+
+    std::string hello = "Hello, " + m_NameS;
+
+    SDL_Color font_color = {250, 250, 250};
+
+    SDL_Surface* surface = nullptr;
+    surface = TTF_RenderText_Solid(font, hello.c_str(), font_color);
+
+    m_Hello = SDL_CreateTextureFromSurface(m_Renderer, surface);
+
+    SDL_FreeSurface(surface);
+
+    TTF_SizeText(font, hello.c_str(), &m_HelloRect.w, &m_HelloRect.h);
+    m_HelloRect.x = 200;
+    m_HelloRect.y = 400;
+}
+
+void InputSomething::DrawTexture() {
+        SDL_RenderCopy(m_Renderer, m_Background, nullptr, nullptr);
+        SDL_RenderCopy(m_Renderer, m_Question, nullptr, &m_QsRect);
+        SDL_RenderCopy(m_Renderer, m_Name, nullptr, &m_NameRect);
+        SDL_RenderCopy(m_Renderer, m_Hello, nullptr, &m_HelloRect);
+        SDL_RenderPresent(m_Renderer);
+        SDL_RenderClear(m_Renderer);
 }
 
 void InputSomething::Run() {
@@ -140,9 +184,30 @@ void InputSomething::Run() {
     }
     CreateTexture();
 
-    DrawQuestion();
+    bool isRunning = true;
 
-    SDL_Delay(1000);
+    while(isRunning == true) {
+        DrawTexture();
+
+        while(SDL_PollEvent(&m_Event) != 0) {
+            if(m_Event.type == SDL_QUIT) {
+                isRunning = false;
+                break;
+            } else if(m_Event.type == SDL_KEYDOWN) {
+                if(m_Event.key.keysym.sym == SDLK_ESCAPE) {
+                    isRunning = false;
+                    break;
+                } else if(m_Event.key.keysym.sym == SDLK_RETURN)
+                    UpdateHelloTexture();
+            } else if(m_Event.type == SDL_TEXTINPUT) {
+                m_NameS += m_Event.text.text;
+                UpdateNameTexture();
+                break;
+            } else {
+                break;
+            }
+        }
+    }
 
     SDL_Log("Finished run.");
 }
