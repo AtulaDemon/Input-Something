@@ -1,9 +1,6 @@
 #ifndef INPUTSOMETHING_H
 #define INPUTSOMETHING_H
 
-#define SCREEN_WIDTH 1000
-#define SCREEN_HEIGHT 600
-
 #include <SDL2/SDL_events.h>
 #include <string>
 

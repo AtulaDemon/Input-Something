@@ -5,6 +5,10 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 
+constexpr int SCREEN_WIDTH = 1000;
+constexpr int SCREEN_HEIGHT = 600;
+
+
 InputSomething::InputSomething()
     :   m_Window(nullptr),
         m_Renderer(nullptr),
@@ -18,13 +22,13 @@ InputSomething::InputSomething()
 
 void InputSomething::Init() {
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0) {
-        std::cout << "could not init SDL\n" << SDL_GetError();
+        SDL_Log("could not init SDL\n", SDL_GetError());
         return;
     }
 
     if(TTF_Init() < 0) {
-       SDL_Log("SDL_TTF init problem: %s]n", TTF_GetError());
-       return;
+        SDL_Log("SDL_TTF init problem: %s]n", TTF_GetError());
+        return;
     }
 
     if(IMG_Init(IMG_INIT_JPG) == 0) {
@@ -34,14 +38,14 @@ void InputSomething::Init() {
 
     m_Window = SDL_CreateWindow ("Input Something", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 
-    if(m_Window == 0) {
+    if(m_Window == nullptr) {
         SDL_Log("Could not create SDL Window: %s\n", SDL_GetError());
         return;
     }
 
     m_Renderer = SDL_CreateRenderer(m_Window,-1,SDL_RENDERER_ACCELERATED);
 
-    if(m_Renderer == 0) {
+    if(m_Renderer == nullptr) {
         SDL_Log("Could not create renderer: %s\n", SDL_GetError());
         return;
     }
@@ -177,7 +181,7 @@ void InputSomething::Run() {
     if(m_Init == false) {
         Init();
 
-        if(m_Init = false) {
+        if(m_Init == false) {
             std::cout << "Init_Error";
             return;
         }
